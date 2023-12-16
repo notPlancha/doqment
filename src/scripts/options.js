@@ -62,6 +62,7 @@ function renderControl(key, property) {
   const control = (nums ? renderSelect : renderInput)(key, property);
   control.id = key;
   control.dataset.type = type;
+  control.classList.add("optionField");
   return control;
 }
 
