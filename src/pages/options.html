@@ -3,25 +3,31 @@
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="options.css">
+    <script src="/scripts/options.js" defer></script>
   </head>
   <body>
+    <div id="pdfjsOptions" class="options"></div>
     <iframe src="/pdfjs/web/viewer.html?file=" hidden></iframe>
-    <form>
-      <fieldset id="advanced" disabled>
+
+    <template id="moreOptions">
+      <fieldset class="more options" disabled>
         <legend>
-          <label><input type="checkbox">Advanced Options</label>
+          <label><input type="checkbox">Show Advanced Options</label>
         </legend>
       </fieldset>
-    </form>
-    <script src="/scripts/options.js"></script>
-    <template>
-      <div class="pref-row">
-        <div class="pref-title">
-          <span></span>
-          <span class="pref-field"><label></label></span>
-        </div>
-        <div class="pref-desc"></div>
+    </template>
+
+    <template id="option">
+      <div>
+        <div class="header"><span></span></div>
+        <div class="caption"></div>
       </div>
     </template>
+
+    <template id="toggle">
+      <span class="toggle">
+        <input type="checkbox" id>
+        <label for></label>
+      </span>
   </body>
 </html>
