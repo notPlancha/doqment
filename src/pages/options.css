@@ -8,7 +8,6 @@
   --accent-color: royalblue;
   --hover-color: rgb(var(--black), 0.1);
   --active-color: rgb(var(--black), 0.2);
-  --toggle-groove-color: rgb(var(--white), 0.5);
   --border-color: var(--hover-color);
   color-scheme: light dark;
 }
@@ -20,7 +19,6 @@
     --accent-color: skyblue;
     --hover-color: rgb(var(--white), 0.1);
     --active-color: rgb(var(--white), 0.2);
-    --toggle-groove-color: rgb(var(--black), 0.5);
     --border-color: var(--active-color);
   }
 }
@@ -63,7 +61,7 @@ input.optionField {
 .optionField {
   width: var(--field-width, 200px);
   padding: var(--field-padding, 0.45em);
-  border-radius: 4px;
+  border-radius: var(--field-corner-radius, 4px);
   border-color: transparent;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -110,10 +108,9 @@ legend :checked + span {
 .toggle {
   --height: 16px;
   --width: calc(var(--height) * var(--proportion, 2));
-  --half-height: calc(var(--height) / 2);
+  --end-radius: calc(var(--height) * 0.5);
   --thumb-size: calc(var(--height) - 4px);
-  --thumb-color: currentColor;
-  --groove-length: calc(var(--width) / 2);
+  --groove-length: calc(var(--width) - var(--height));
   --toggle-transition: translate 100ms;
   flex-shrink: 0;
 }
@@ -131,9 +128,9 @@ legend :checked + span {
   box-sizing: border-box;
   height: var(--height);
   width: var(--width);
-  border: var(--border-size, 1px) solid ButtonBorder;
-  border-radius: var(--half-height);
-  background-color: var(--toggle-color, ButtonFace);
+  border: 1px solid ButtonBorder;
+  border-radius: var(--end-radius);
+  background-color: var(--background, ButtonFace);
   z-index: 0;
 }
 
@@ -157,8 +154,8 @@ legend :checked + span {
   width: var(--thumb-size);
   height: var(--thumb-size);
   border-radius: 50%;
-  background-color: var(--thumb-color);
-  opacity: var(--thumb-opacity, 0.5);
+  background-color: currentColor;
+  opacity: 0.5;
   transition: var(--toggle-transition);
   z-index: 1;
 }
@@ -170,7 +167,7 @@ legend :checked + span {
 }
 
 .toggle :focus-visible + label {
-  outline: var(--toggle-outline, auto);
+  outline: var(--outline, auto);
   outline-offset: 2px;
 }
 
@@ -181,16 +178,16 @@ body.chrome {
   --option-padding: 12px 20px;
   --caption-opacity: 0.6;
   --field-width: 150px;
-  --field-padding: 4px;
+  --field-padding: 6px 4px;
+  --field-corner-radius: 6px;
+  --field-background: transparent;
+  --field-border-color: var(--active-color);
 }
 
 @media (prefers-color-scheme: dark) {
   body.chrome {
     --main-background: rgb(41, 42, 45);
-    --field-background: Canvas;
-  }
-  .chrome .toggle {
-    --ripple-opacity: 0.4;
+    --field-border-color: ButtonBorder;
   }
 }
 
@@ -204,67 +201,67 @@ body.chrome {
   cursor: pointer;
 }
 
+.chrome input.optionField {
+  padding-left: 8px;
+}
+
 .chrome .optionField {
   margin-bottom: 1px;
   outline-offset: 2px;
-}
-
-.chrome :is(.optionField, .toggle > label):is(:hover, :active) {
-  background-image: none;
+  border: 1px solid var(--field-border-color);
 }
 
 .chrome .toggle {
-  --height: 12px;
-  --proportion: 7 / 3;
-  --border-size: 0;
+  --proportion: 1.625;
   --thumb-margin: 0;
-  --thumb-size: calc(var(--height) + 4px);
-  --toggle-color: darkgray;
-  --thumb-color: white;
-  --thumb-opacity: 1;
-  --groove-length: calc(var(--width) + 6px - var(--thumb-size));
-  --toggle-outline: none;
+  --thumb-size: var(--end-radius);
+  --background: var(--hover-color);
+  --outline: 2px solid var(--accent-color);
   --ripple-size: calc(var(--thumb-size) * 2.5);
   --toggle-transition: translate linear 80ms, background-color linear 80ms;
 }
 
 .chrome .toggle > label {
   position: relative;
-  opacity: 0.85;
   transition: var(--toggle-transition);
+}
+
+.chrome .toggle > label:is(:hover, :active) {
+  background-image: none;
 }
 
 .chrome .toggle :checked + label {
-  box-shadow: inset 0 0 0 var(--half-height) var(--toggle-groove-color);
+  --thumb-size: calc(var(--height) * 0.75);
 }
 
+.chrome .toggle > label::after,
 .chrome .toggle > label::before {
-  transform: translate(-3px, -2px);
-  box-shadow: 0 1px 3px rgb(var(--black), 0.5);
+  position: absolute;
+  top: 50%;
+  left: calc(var(--end-radius) - 1px);
+  transform: translate(-50%, -50%);
+  transition-property: translate, background-color, width, height;
+  transition-timing-function: linear;
+  transition-duration: 80ms;
 }
 
-.chrome .toggle :checked + label::before {
-  background-color: inherit;
+.chrome .toggle > label:active::before {
+  --thumb-expand: calc(var(--thumb-size) + 2px);
+  width: var(--thumb-expand);
+  height: var(--thumb-expand);
 }
 
 /* Ripple around the thumb */
-.chrome .toggle :focus-visible + label::after {
+.chrome .toggle > label:hover::after {
   content: "";
-  position: absolute;
-  top: 50%;
-  left: calc(-3px + var(--thumb-size) / 2);
   width: var(--ripple-size);
   height: var(--ripple-size);
   border-radius: 50%;
-  transform: translate(-50%, -50%);
   background-color: currentColor;
-  opacity: var(--ripple-opacity, 0.1);
-  transition: var(--toggle-transition);
+  opacity: 0.1;
   z-index: 2;
 }
 
 .chrome .toggle :checked + label::after {
-  background-color: inherit;
-  opacity: var(--ripple-opacity, 0.4);
   translate: var(--groove-length);
 }
